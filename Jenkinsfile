@@ -22,16 +22,17 @@ pipeline {
             }
             steps {
                 withCredentials([usernamePassword(
-                credentialsId: 'GitHub-PAT',
-                usernameVariable: 'GIT_USER',
-                passwordVariable: 'GIT_TOKEN'
-            )]) {
+            credentialsId: 'GitHub-PAT',
+            usernameVariable: 'GIT_USER',
+            passwordVariable: 'GIT_TOKEN'
+        )]) {
             sh '''
               git config user.name "jenkins-bot"
               git config user.email "jenkins@local"
 
+              git fetch origin main
               git checkout main
-              git pull https://${GIT_USER}:${GIT_TOKEN}@github.com/rounak13062001/SpringBoot-RestAPI.git main
+              git pull origin main
 
               git merge dev
 
