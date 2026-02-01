@@ -32,7 +32,6 @@ pipeline {
 
               git fetch origin main
               git checkout -B main FETCH_HEAD
-
               git merge origin/dev
 
               git push https://${GIT_USER}:${GIT_TOKEN}@github.com/rounak13062001/SpringBoot-RestAPI.git main
