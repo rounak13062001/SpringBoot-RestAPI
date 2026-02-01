@@ -31,7 +31,7 @@ pipeline {
               git config user.email "jenkins@local"
 
               git fetch origin main
-              git checkout -B main origin/main
+              git checkout -B main FETCH_HEAD
 
               git merge dev
 
