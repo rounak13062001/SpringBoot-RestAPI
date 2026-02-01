@@ -2,43 +2,40 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven'
+        maven 'Maven3'
+        jdk 'JDK21'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage('Build') {
             steps {
-                checkout scm
+                sh 'mvn clean compile'
             }
         }
-        stage('Build & Unit Test') {
-            steps {
-                sh 'mvn clean test -DskipTests'
-            }
-        }
-        stage('Auto Merge Dev → Main') {
+
+        stage('Test') {
             when {
                 branch 'dev'
             }
             steps {
-                withCredentials([usernamePassword(
-            credentialsId: 'GitHub-PAT',
-            usernameVariable: 'GIT_USER',
-            passwordVariable: 'GIT_TOKEN'
-        )]) {
-            sh '''
-              git config user.name "jenkins-bot"
-              git config user.email "jenkins@local"
-
-              git fetch origin main
-              git checkout -B main FETCH_HEAD
-              git merge origin/dev
-
-              git push https://${GIT_USER}:${GIT_TOKEN}@github.com/rounak13062001/SpringBoot-RestAPI.git main
-            '''
+                sh 'mvn test -DskipTests'
+            }
         }
-    }
-}
 
+        stage('SonarQube Analysis') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                      mvn sonar:sonar \
+                      -Dsonar.projectKey=springboot-restapi \
+                      -Dsonar.projectName=SpringBoot-RestAPI
+                    '''
+                }
+            }
+        }
     }
 }
